@@ -33,6 +33,7 @@ class Dashboard(Base):
     usage = relationship('DashboardUsage', order_by='DashboardUsage.user_rk', backref='dashboard')
     readers = relationship('User', order_by='User.rk', secondary='dashboard_usage', backref='dashboards_read')
     owners = relationship('User', order_by='User.rk', secondary='dashboard_owner', backref='dashboards_owned')
+    steward = relationship('User', order_by='User.rk', secondary='dashboard_steward', backref='dashboards_steward')
     followers = relationship('User', order_by='User.rk', secondary='dashboard_follower', backref='dashboards_followed')
     tables = relationship('Table', order_by='Table.rk', secondary='dashboard_table', backref='dashboards')
     tags = relationship('Tag', order_by='Tag.rk', secondary='dashboard_tag', backref='dashboards')
@@ -103,6 +104,20 @@ class DashboardOwner(Base):
     published_tag = Column(String(PUBLISHED_TAG_LEN))
     publisher_last_updated_epoch_ms = Column(BigInteger)
 
+class DashboardSteward(Base):
+    """
+    Association model for dashboard-steward.
+    """
+    __tablename__ = 'dashboard_steward'
+
+    dashboard_rk = Column(String(KEY_LEN, **INDEX_KEY_COLLATION_ARGS),
+                          ForeignKey('dashboard.rk', ondelete='cascade'),
+                          primary_key=True)
+    user_rk = Column(String(320, **INDEX_KEY_COLLATION_ARGS),
+                     ForeignKey('users.rk', ondelete='cascade'),
+                     primary_key=True)
+    published_tag = Column(String(PUBLISHED_TAG_LEN))
+    publisher_last_updated_epoch_ms = Column(BigInteger)
 
 class DashboardFollower(Base):
     """
